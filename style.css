@@ -23,7 +23,9 @@
     max-width: 90px;
     background-color: #304859;
     height: 90px;
+    border: none;
     color: white !important;
+    position: relative;
     display: grid;
     place-items: center;
     font-size: 30px;
@@ -63,3 +65,37 @@ nav{
     align-items: center;
 }
 
+.backButton{
+    position: absolute;
+    width: 39px;
+    height: 39px;
+    background-color:#304859;
+    transition: all .4s;
+    color: white;
+    font-size: 26px;
+    border-radius: 100%;
+    border: none;
+}
+
+.hiddenButton{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index:1;
+    opacity: 0;
+
+}
+
+.icons{
+position: relative;
+}
+
+.disabledIcons{
+    background-color: #304859 !important;
+    color: #304859 !important;
+}
+
+.activeAfterMatch{
+    background-color: #24c2daa9 !important;
+    color: white !important;
+}
