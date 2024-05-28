@@ -1,47 +1,69 @@
 const allICONS = [
-    `fa-brands fa-twitter`,
+    "fa-brands fa-twitter",
     "fa-solid fa-camera-retro",
-    "fa-solid fa-wifi",
+    "fa-solid fa-heart",
     "fa-solid fa-bell",
-    `fa-brands fa-twitter`,
-    "fa-solid fa-camera-retro",
-    "fa-solid fa-bookmark",
-    "fa-solid fa-heart",
-    "fa-brands fa-whatsapp",
     "fa-solid fa-bookmark",
     "fa-solid fa-wifi",
-    "fa-solid fa-heart",
-    "fa-brands fa-google-play",
-    "fa-brands fa-google-play",
     "fa-brands fa-whatsapp",
-    "fa-solid fa-bell"
-]
-let clickedIcons = [], result = [], cashed = '';
-const memoryState = {
-    iconContainer: document.getElementById("memoryContainer"),
-    handleMatchedIcons: (icon, id) => {
-        if (clickedIcons.length == 2) {
-            if (clickedIcons.includes(icon)) {
-                
-                result.push(icon)
-                displayIcons(currentState);
-            }
-            else {
-                clickedIcons = []
-                displayIcons(currentState);
-            }
-        }
-        {
-            clickedIcons = [clickedIcons, icon];
-            prevIcon = [];
-        }
-        return result;
-    },
-    restartButton: document.getElementById("restartButton"),
-    currentState: []
-}
+    "fa-brands fa-google-play"
+];
 
-let { iconContainer, handleMatchedIcons, restartButton, currentState } = memoryState;
+const hideIcons = () => {
+    document.querySelectorAll(".iconContainer").forEach((element) => {
+        element.classList.add("disabledIcons");
+    });
+};
+
+const clearStates = () => {
+    memoryState.clickedIcons = [];
+    memoryState.handledIconsId = [];
+};
+
+const memoryState = {
+    iconContainer: null,
+    restartButton: null,
+    clickedIcons: [],
+    handledIconsId: []
+};
+
+const handleIcons = (icon, id) => {
+    const button = document.getElementById(id);
+    button.setAttribute("disabled", true);
+    const iconElement = document.getElementById(`icon${id}`);
+    iconElement.classList.remove("disabledIcons");
+    memoryState.clickedIcons.push({ icon, id });
+    
+    if (memoryState.clickedIcons.length === 2) {
+        const [first, second] = memoryState.clickedIcons;
+
+        if (first.icon === second.icon) {
+            document.querySelectorAll(`.${icon.split(" ")[1] + 1}`).forEach((e) => {
+                e.classList.add("activeAfterMatch");
+            });
+            clearStates();
+        } else {
+            setTimeout(() => {
+                memoryState.clickedIcons.forEach(clicked => {
+                    document.getElementById(clicked.id).removeAttribute("disabled");
+                    document.getElementById(`icon${clicked.id}`).classList.add("disabledIcons");
+                });
+                clearStates();
+            }, 800);
+        }
+    }
+};
+
+const displayIcons = (shuffledArray) => {
+    let text = ``;
+    shuffledArray.forEach((icon, index) => {
+        text += `<div class='icons'>
+                    <button class='hiddenButton' id='${index}' onclick='handleIcons("${icon}", "${index}")'></button>
+                    <div class='iconContainer ${icon.split(" ")[1] + 1}' id='icon${index}'><i class='${icon}'></i></div>
+                 </div>`;
+    });
+    memoryState.iconContainer.innerHTML = text;
+};
 
 const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -49,32 +71,20 @@ const shuffleArray = (array) => {
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
-}
-
-const displayIcons = (shuffledArray) => {
-    let text = ''
-    // for (let i = 0; i < 2; i++) {
-        shuffleArray(shuffledArray).map((icon, index) => {
-            text += `<button class='${icon.split(" ")[1]+1}  ${result.includes(icon) ? 'activeIcon' : ''}  iconContainer' 
-            id='${index + `_` + i}' onclick="handleMatchedIcons('${icon}','${index + '_' + i}')" > 
-            <i class='${icon}'></i> 
-            </button>`
-        })
-    // }
-    iconContainer.innerHTML = text;
-}
+};
 
 window.onload = () => {
-    currentState = allICONS;
-    displayIcons(currentState)
-    result = []
-    clickedIcons = []
-}
+    memoryState.iconContainer = document.getElementById("memoryContainer");
+    memoryState.restartButton = document.getElementById("restartButton");
 
-restartButton.onclick = () => {
-    result = []
-    clickedIcons = []
-    currentState = shuffleArray(allICONS)
-    displayIcons(currentState);
-}
+    const shuffledIcons = shuffleArray([...allICONS, ...allICONS]);
+    displayIcons(shuffledIcons);
+    hideIcons();
 
+    memoryState.restartButton.onclick = () => {
+        clearStates();
+        const newShuffledIcons = shuffleArray([...allICONS, ...allICONS]);
+        displayIcons(newShuffledIcons);
+        hideIcons();
+    };
+};
