@@ -1,3 +1,4 @@
+alert("Start Game")
 const allICONS = [
     "fa-brands fa-twitter",
     "fa-solid fa-camera-retro",
@@ -6,8 +7,40 @@ const allICONS = [
     "fa-solid fa-bookmark",
     "fa-solid fa-wifi",
     "fa-brands fa-whatsapp",
-    "fa-brands fa-google-play"
+    "fa-brands fa-google-play",
 ];
+
+const memoryState = {
+    iconContainer: document.getElementById("memoryContainer"),
+    restartButton: document.getElementById("restartButton"),
+    clickedIcons: [],
+    handledIconsId: [],
+    resultState: [],
+    shuffledIcons: [],
+    minutes: 0,
+    time: null,
+    moves: 26,
+    second: 0,
+    timerContainer: document.getElementById("timer"),
+    movesContainer: document.getElementById("moves"),
+    countState: true,
+};
+
+let {
+    timerContainer,
+    movesContainer,
+    clickedIcons,
+    handledIconsId,
+    restartButton,
+    iconContainer,
+    resultState,
+    shuffledIcons,
+    minutes,
+    moves,
+    second,
+    time,
+    countState,
+} = memoryState;
 
 const hideIcons = () => {
     document.querySelectorAll(".iconContainer").forEach((element) => {
@@ -16,40 +49,95 @@ const hideIcons = () => {
 };
 
 const clearStates = () => {
-    memoryState.clickedIcons = [];
-    memoryState.handledIconsId = [];
+    clickedIcons = [];
+    handledIconsId = [];
+
 };
 
-const memoryState = {
-    iconContainer: null,
-    restartButton: null,
-    clickedIcons: [],
-    handledIconsId: []
+const clearTimeAfterGameIsOver = () => {
+    second = 0;
+    minutes = 0;
+    moves = 26;
+    handleMoves();
+};
+
+let handleMoves = () => {
+    let newMove = moves--;
+    movesContainer.innerHTML = newMove;
+};
+
+let handleHiddenButtons = (status) => {
+    document.querySelectorAll(".hiddenButton").forEach((button) => {
+        if (status) {
+            button.setAttribute("disabled", true);
+        }
+        else {
+            button.removeAttribute("disabled");
+        }
+    });
+};
+
+const checkExpiry = () => {
+    if (moves == 0 || (minutes == 0 && second == 60)) {
+        alert("Game is Over");
+        resetGame();
+        handleHiddenButtons(true);
+        resultState = [];
+        return false;
+    } else if (resultState.length == 8) {
+        alert(`You did it! in ${second}s with ${25 - moves} moves`);
+        resetGame();
+        resultState = [];
+        return false;
+    } else {
+        return true;
+    }
+};
+
+const counter = () => {
+    time = setInterval(() => {
+        if (!checkExpiry()) {
+            clearTimeAfterGameIsOver();
+            clearTimeout(time);
+        }
+        {
+            timerContainer.innerHTML = `${minutes}:${second <= 9 ? "0" + second++ : second++}`;
+        }
+        if (second == 61) {
+            second = 0;
+            clearInterval(time);
+            minutes++;
+            counter();
+        }
+    }, 1000);
 };
 
 const handleIcons = (icon, id) => {
+    checkExpiry();
     const button = document.getElementById(id);
     button.setAttribute("disabled", true);
     const iconElement = document.getElementById(`icon${id}`);
     iconElement.classList.remove("disabledIcons");
-    memoryState.clickedIcons.push({ icon, id });
-    
-    if (memoryState.clickedIcons.length === 2) {
-        const [first, second] = memoryState.clickedIcons;
-
+    clickedIcons.push({ icon, id });
+    if (clickedIcons.length === 2) {
+        const [first, second] = clickedIcons;
         if (first.icon === second.icon) {
+            resultState = [...resultState, first.id];
             document.querySelectorAll(`.${icon.split(" ")[1] + 1}`).forEach((e) => {
                 e.classList.add("activeAfterMatch");
             });
             clearStates();
         } else {
+            handleMoves();
             setTimeout(() => {
-                memoryState.clickedIcons.forEach(clicked => {
+                clickedIcons.forEach((clicked) => {
                     document.getElementById(clicked.id).removeAttribute("disabled");
-                    document.getElementById(`icon${clicked.id}`).classList.add("disabledIcons");
+                    document
+                        .getElementById(`icon${clicked.id}`)
+                        .classList.add("disabledIcons");
                 });
                 clearStates();
-            }, 800);
+            }, 300);
         }
     }
 };
@@ -58,11 +146,12 @@ const displayIcons = (shuffledArray) => {
     let text = ``;
     shuffledArray.forEach((icon, index) => {
         text += `<div class='icons'>
-                    <button class='hiddenButton' id='${index}' onclick='handleIcons("${icon}", "${index}")'></button>
-                    <div class='iconContainer ${icon.split(" ")[1] + 1}' id='icon${index}'><i class='${icon}'></i></div>
-                 </div>`;
+        <button class='hiddenButton' name='hiddenButton' id='${index}' onclick='handleIcons("${icon}", "${index}")'></button>
+        <div class='iconContainer ${icon.split(" ")[1] + 1}' 
+            id='icon${index}'><i class='${icon}'></i></div>
+        </div>`;
     });
-    memoryState.iconContainer.innerHTML = text;
+    iconContainer.innerHTML = text;
 };
 
 const shuffleArray = (array) => {
@@ -73,18 +162,29 @@ const shuffleArray = (array) => {
     return array;
 };
 
-window.onload = () => {
-    memoryState.iconContainer = document.getElementById("memoryContainer");
-    memoryState.restartButton = document.getElementById("restartButton");
-
-    const shuffledIcons = shuffleArray([...allICONS, ...allICONS]);
+function resetGame() {
+    shuffledIcons = shuffleArray([...allICONS, ...allICONS]);
     displayIcons(shuffledIcons);
+    clearTimeAfterGameIsOver();
+    clearStates();
+    handleMoves();
     hideIcons();
-
-    memoryState.restartButton.onclick = () => {
+    restartButton.onclick = () => {
+        clearInterval(time);
+        clearTimeAfterGameIsOver();
+        counter();
         clearStates();
         const newShuffledIcons = shuffleArray([...allICONS, ...allICONS]);
         displayIcons(newShuffledIcons);
         hideIcons();
+        handleMoves();
     };
+}
+
+window.onload = () => {
+    resetGame();
+    if (countState) {
+        counter();
+        countState = false;
+    }
 };
