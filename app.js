@@ -1,10 +1,12 @@
+let memoryState = {}
 const formState = {
     temp: {},
     formObject: {},
-    submitState: false
+    submitState: false,
+    handleIcons: ''
 }
 
-let { temp, formObject, submitState } = formState
+let { temp, formObject, submitState, handleIcons } = formState
 
 const handleChange = (event) => {
     let { value, id } = event;
@@ -12,7 +14,6 @@ const handleChange = (event) => {
 }
 
 const handleSubmit = () => {
-    console.log('clicked');
     formObject = temp;
     submitState = true;
     modal.classList.add("hide")
@@ -35,8 +36,6 @@ const allICONS = [
     "fa-brands fa-google-play",
 ];
 
-let memoryState = {}
-
 const startGame = () => {
     memoryState = {
         iconContainer: document.getElementById("memoryContainer"),
@@ -52,10 +51,13 @@ const startGame = () => {
         timerContainer: document.getElementById("timer"),
         movesContainer: document.getElementById("moves"),
         countState: true,
+        handleIcons: '',
+        lastIndex: 1,
+        maxSecond: 60,
+        initialSecond: 0,
+        initialMinute: 0
     };
 }
-
-
 
 function game() {
     let { movesFromUser, minutesFromUser, secondsFromUser } = formObject;
@@ -66,7 +68,9 @@ function game() {
         clickedIcons,
         handledIconsId,
         restartButton,
+        maxSecond,
         iconContainer,
+        initialSecond,
         resultState,
         shuffledIcons,
         minutes,
@@ -74,6 +78,8 @@ function game() {
         second,
         time,
         countState,
+        lastIndex,
+        initialMinute
     } = memoryState;
 
 
@@ -90,15 +96,15 @@ function game() {
     };
 
     const clearTimeAfterGameIsOver = () => {
-        second = 0;
-        minutes = 0;
+        second = initialSecond;
+        minutes = initialMinute;
         moves = movesFromUser;
         handleMoves();
     };
 
     let handleMoves = () => {
-        let newMove = moves--;
-        movesContainer.innerHTML = newMove;
+        moves--;
+        movesContainer.innerHTML = moves
     };
 
     let handleHiddenButtons = (status) => {
@@ -113,14 +119,14 @@ function game() {
     };
 
     const checkExpiry = () => {
-        if (moves == 0 || (minutes == 0 && second == 60)) {
-            alert("Game is Over");
+        if (moves == -1 || (minutes == minutesFromUser && second == secondsFromUser)) {
             resetGame();
+            alert("Game is Over");
             handleHiddenButtons(true);
             resultState = [];
             return false;
         } else if (resultState.length == 8) {
-            alert(`You did it! in ${second}s with ${25 - moves} moves`);
+            alert(`You did it! in ${second}s with ${movesFromUser - moves} moves`);
             resetGame();
             resultState = [];
             return false;
@@ -138,8 +144,8 @@ function game() {
             {
                 timerContainer.innerHTML = `${minutes}:${second <= 9 ? "0" + second++ : second++}`;
             }
-            if (second == 61) {
-                second = 0;
+            if (second == maxSecond) {
+                second = initialSecond;
                 clearInterval(time);
                 minutes++;
                 counter();
@@ -147,7 +153,8 @@ function game() {
         }, 1000);
     };
 
-    function handleIcons(icon, id) {
+    handleIcons = (icon, id) => {
+        handleMoves();
         checkExpiry();
         const button = document.getElementById(id);
         button.setAttribute("disabled", true);
@@ -158,10 +165,9 @@ function game() {
             const [first, second] = clickedIcons;
             if (first.icon === second.icon) {
                 resultState = [...resultState, first.id];
-                document.querySelectorAll(`.${icon.split(" ")[1] + 1}`).forEach((e) => e.classList.add("activeAfterMatch"));
+                document.querySelectorAll(`.${icon.split(' ')[lastIndex]}i`).forEach((e) => e.classList.add("activeAfterMatch"));
                 clearStates();
             } else {
-                handleMoves();
                 setTimeout(() => {
                     clickedIcons.forEach((clicked) => {
                         document.getElementById(clicked.id).removeAttribute("disabled");
@@ -177,10 +183,10 @@ function game() {
         let text = ``;
         shuffledArray.forEach((icon, index) => {
             text += `<div class='icons'>
-        <button class='hiddenButton' name='hiddenButton' id='${index}' onclick='handleIcons("${icon}", "${index}")'></button>
-        <div class='iconContainer ${icon.split(" ")[1] + 1}' 
+            <button class='hiddenButton' name='hiddenButton' id='${index}' onclick='handleIcons("${icon}", "${index}")'></button>
+            <div class='iconContainer ${icon.split(' ')[lastIndex]}i' 
             id='icon${index}'><i class='${icon}'></i></div>
-        </div>`;
+            </div>`;
         });
         iconContainer.innerHTML = text;
     };
@@ -198,8 +204,8 @@ function game() {
         displayIcons(shuffledIcons);
         clearTimeAfterGameIsOver();
         clearStates();
-        handleMoves();
         hideIcons();
+        movesContainer.innerHTML = moves;
         restartButton.onclick = () => {
             clearInterval(time);
             clearTimeAfterGameIsOver();
@@ -210,7 +216,7 @@ function game() {
             hideIcons();
             handleMoves();
         };
-        if (!countState) {
+        if (countState) {
             counter();
             countState = false;
         }
