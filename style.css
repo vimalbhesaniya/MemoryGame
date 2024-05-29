@@ -1,3 +1,8 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 .container {
   display: flex;
   align-items: center;
@@ -132,4 +137,82 @@ nav {
   width: 100%;
   max-width: 600px;
   gap: 20px;
+}
+
+.modalContainer {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #3048599b;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.inputForm {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  padding: 50px 40px;
+  border-radius: 7px;
+  background-color: white;
+}
+
+input[type="number"] {
+  padding: 13px 16px;
+  width: 100%;
+  border-radius: 7px;
+  border: 0;
+  outline: none;
+  background-color: #bdd7eaa3;
+  transition: 0.4s;
+}
+
+input[type="number"]:focus {
+  background-color: #ffffffa3;
+  outline: 1px solid #0572c0;
+}
+
+input[type="submit"] {
+  padding: 10px 12px;
+  width: 100%;
+  background-color: #0095ffc6;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  transition: 0.5s;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover {
+  background-color: #0572c0;
+}
+
+.formHeader {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-weight: 600;
+  letter-spacing: 1.3px;
+  margin-bottom: 30px;
+}
+
+label {
+  font-size: 13px;
+}
+
+.error {
+  font-size: 13px;
+  color: red;
+}
+
+.hide {
+  display: none;
 }
