@@ -217,7 +217,7 @@ function game() {
             handleMoves();
         };
         if (countState) {
-            counter();
+            // counter();
             countState = false;
         }
 
