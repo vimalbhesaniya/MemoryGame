@@ -13,43 +13,24 @@
 
 <body>
     <div class="modalContainer" id="modal">
-<<<<<<< HEAD
         <form class="inputForm" method="get" onsubmit="handleSubmit(this)" autocomplete="off">
             <h1 class="formHeader">Please fill the form</h1>
             <div>
                 <label for="inputForMoves">How many moves do you want</label>
                 <input type="number" id="movesFromUser" min="5" max="50" placeholder="Moves" name="movesFromUser"
                     oninput="handleChange(this)" required />
-=======
-        <form class="inputForm" onsubmit="handleSubmit(this)" autocomplete="off">
-            <h1 class="formHeader">Please fill the form</h1>
-            <div>
-                <label for="inputForMoves">How many moves do you want</label>
-                <input type="number" id="movesFromUser" placeholder="Moves" name="movesFromUser"
-                    oninput="handleChange(this)" />
->>>>>>> main
                 <span class="error" id="errorForMoves"></span>
             </div>
             <div>
                 <label for="inputForMinutes">How much minutes do you want</label>
-<<<<<<< HEAD
                 <input type="number" id="minutesFromUser" min="0" max="5" placeholder="Minutes" name="minutesFromUser"
                     oninput="handleChange(this)" required />
-=======
-                <input type="number" id="minutesFromUser" placeholder="Minutes" name="minutesFromUser"
-                    oninput="handleChange(this)" />
->>>>>>> main
                 <span class="error" id="errorForMinutes"></span>
             </div>
             <div>
                 <label for="inputForSecond">How much seconds do you want</label>
-<<<<<<< HEAD
                 <input type="number" name="secondsFromUser" min="0" max="59" placeholder="Seconds" id="secondsFromUser"
                     oninput="handleChange(this)" required />
-=======
-                <input type="number" name="secondsFromUser" placeholder="Seconds" id="secondsFromUser"
-                    oninput="handleChange(this)" />
->>>>>>> main
                 <span class="error" id="errorForSecond"></span>
             </div>
             <input type="submit" value="Start Game" />
